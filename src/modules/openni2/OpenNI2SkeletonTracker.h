@@ -15,7 +15,9 @@
 #include <iostream>
 
 #include <OpenNI.h>
-#include <NiTE.h>
+#ifdef OPENNI2_DRIVER_USES_NITE2
+    #include <NiTE.h>
+#endif
 
 #include <yarp/sig/Vector.h>
 #include <yarp/sig/Image.h>
@@ -43,8 +45,11 @@ public:
     /**
      * Struct with the data from a single user skeleton.
      */
-    typedef struct USER_SKELETON {
+    typedef struct USER_SKELETON
+    {
+#ifdef OPENNI2_DRIVER_USES_NITE2
         nite::SkeletonState skeletonState;
+#endif
         Vector skeletonPointsPos[TOTAL_JOINTS];
         float skeletonPosConfidence[TOTAL_JOINTS];
         Vector skeletonPointsOri[TOTAL_JOINTS];
@@ -74,9 +79,10 @@ public:
      * Sensor data update function. This function updates the data structs with the latest sensor data.
      */
     void updateSensor();
+#ifdef OPENNI2_DRIVER_USES_NITE2
     void updateUserState(const nite::UserData& user, unsigned long long ts);
     void updateJointInformation(const nite::UserData& user, nite::JointType joint, int jIndex);
-    
+#endif
     /**
      * get the static SensorStatus object
      */
@@ -94,10 +100,9 @@ private:
     int colorVideoMode;
     string deviceName;
 
-    // OpenNI2 and NiTE objects
+    // OpenNI2 objects
     openni::Device device;
     openni::Device* pDevice;
-    nite::UserTracker userTracker;
     openni::Recorder recorder;
     openni::PlaybackControl* playbackControl;
     openni::VideoStream depthStream;
@@ -108,7 +113,12 @@ private:
     openni::VideoFrameRef imageFrameRef;
     const openni::SensorInfo* depthInfo;
     const openni::SensorInfo* colorInfo;
+
+    //NiTE objects
+#ifdef OPENNI2_DRIVER_USES_NITE2
     nite::UserTrackerFrameRef userTrackerFrameRef;
+    nite::UserTracker userTracker;
+#endif
     int init();
     void initVars();
 };

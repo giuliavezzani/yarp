@@ -59,6 +59,7 @@ void OpenNI2SkeletonTracker::close(){
         recorder.destroy(); 
         cout << "Done" << endl;
     }
+#ifdef OPENNI2_DRIVER_USES_NITE2
     if (userTracking) {
         cout << "Destroying user tracker...";
         for (int i=0; i < MAX_USERS; i++) {
@@ -68,7 +69,7 @@ void OpenNI2SkeletonTracker::close(){
         nite::NiTE::shutdown();
         cout << "Done" << endl;
     }
-    
+#endif
         depthStream.stop();
         imageStream.stop();
         cout << "Destroying depth stream...";
@@ -120,8 +121,9 @@ int OpenNI2SkeletonTracker::init(){
 
     cout << "OpenNI v" << openni::OpenNI::getVersion().openni::Version::major << "." << openni::OpenNI::getVersion().openni::Version::minor << "." << openni::OpenNI::getVersion().openni::Version::maintenance << "." << openni::OpenNI::getVersion().openni::Version::build <<endl;
     
-     
+#ifdef OPENNI2_DRIVER_USES_NITE2
     cout << "NiTE v" << nite::NiTE::getVersion().nite::Version::major << "." << nite::NiTE::getVersion().nite::Version::minor << "." << nite::NiTE::getVersion().nite::Version::maintenance << "." << nite::NiTE::getVersion().nite::Version::build << endl;
+#endif
     if (oniRecord) {
         recorder.create(oniOutputFile.c_str());
     }
@@ -270,7 +272,7 @@ int OpenNI2SkeletonTracker::init(){
             }
 
         }
-
+#ifdef OPENNI2_DRIVER_USES_NITE2
     if (userTracking){
         // setup and start user tracking
         nite::Status niteRc = nite::NiTE::initialize();
@@ -287,7 +289,8 @@ int OpenNI2SkeletonTracker::init(){
         
         printf("\nStart moving around to get detected...\n(PSI pose may be required for skeleton calibration, depending on the configuration)\n");
     }
-   
+#endif
+
     if (oniRecord) {
         rc = recorder.start();
 
@@ -323,6 +326,7 @@ void OpenNI2SkeletonTracker::initVars(){
     sensorStatus->imageFrame.zero();
     }
     
+#ifdef OPENNI2_DRIVER_USES_NITE2
     // initialise UserSkeleton struct
     for (int i = 0; i < MAX_USERS; i++) {
         sensorStatus->userSkeleton[i].skeletonState = nite::SKELETON_NONE;
@@ -336,6 +340,7 @@ void OpenNI2SkeletonTracker::initVars(){
             sensorStatus->userSkeleton[i].skeletonPointsOri[jointIndex].zero();
         }
     }
+#endif
 }
 
 // returns the sensor data struct (where all the data is)
@@ -375,9 +380,9 @@ void OpenNI2SkeletonTracker::updateSensor(){
         }
     }
     // user skeleton tracking data
-   
-    if(userTracking && userTracker.isValid()){
-        
+#ifdef OPENNI2_DRIVER_USES_NITE2
+    if(userTracking && userTracker.isValid())
+    {
         // reset the stillTracking variable
         for (int i = 0; i < MAX_USERS; i++) {
             sensorStatus->userSkeleton[i].stillTracking = false;
@@ -423,8 +428,10 @@ void OpenNI2SkeletonTracker::updateSensor(){
             }
         }
     }
+#endif
 }
 
+#ifdef OPENNI2_DRIVER_USES_NITE2
 void OpenNI2SkeletonTracker::updateJointInformation(const nite::UserData& user, nite::JointType joint, int jIndex){
     int i = user.getId();
     UserSkeleton *userSkeleton = &getSensor()->userSkeleton[i-1];
@@ -518,8 +525,8 @@ void OpenNI2SkeletonTracker::updateUserState(const nite::UserData& user, unsigne
             }
     }
 }
+#endif
 
 int OpenNI2SkeletonTracker::getDeviceStatus(){
     return deviceStatus;
 }
-

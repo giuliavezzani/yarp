@@ -16,7 +16,9 @@
 #include <yarp/sig/Image.h>
 #include <string>
 #include <iostream>
-#include "NiTE.h"
+#ifdef OPENNI2_DRIVER_USES_NITE2
+    #include "NiTE.h"
+#endif
 
 //included so that the enumeration can be accessed
 #include <yarp/dev/IOpenNI2DeviceDriver.h>
@@ -87,6 +89,8 @@ public:
      * @return doubles array with confidence values per each 3D position vector
      */
     float* getPositionConf(int userID);
+
+#ifdef OPENNI2_DRIVER_USES_NITE2
     /**
      * Get a single user status
      *
@@ -94,6 +98,7 @@ public:
      * @return nite::SkeletonState state
      */
     nite::SkeletonState getSkeletonState(int userID);
+#endif
     /**
      * Get depth frame
      *
@@ -107,8 +112,11 @@ public:
      */
     ImageOf<PixelRgb> getImageFrame();
 private:
-    typedef struct USER_SKELETON {
+    typedef struct USER_SKELETON
+    {
+#ifdef OPENNI2_DRIVER_USES_NITE2
         nite::SkeletonState skeletonState;
+#endif
         Vector skeletonPointsPos[TOTAL_JOINTS];
         Vector skeletonPointsOri[TOTAL_JOINTS];
         float skeletonPosConf[TOTAL_JOINTS];
