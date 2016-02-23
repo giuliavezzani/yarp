@@ -90,7 +90,6 @@ public:
      */
     float* getPositionConf(int userID);
 
-#ifdef OPENNI2_DRIVER_USES_NITE2
     /**
      * Get a single user status
      *
@@ -98,7 +97,6 @@ public:
      * @return nite::SkeletonState state
      */
     nite::SkeletonState getSkeletonState(int userID);
-#endif
     /**
      * Get depth frame
      *
@@ -114,9 +112,7 @@ public:
 private:
     typedef struct USER_SKELETON
     {
-#ifdef OPENNI2_DRIVER_USES_NITE2
         nite::SkeletonState skeletonState;
-#endif
         Vector skeletonPointsPos[TOTAL_JOINTS];
         Vector skeletonPointsOri[TOTAL_JOINTS];
         float skeletonPosConf[TOTAL_JOINTS];
